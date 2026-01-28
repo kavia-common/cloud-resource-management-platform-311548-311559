@@ -2,14 +2,14 @@ const fs = require('fs');
 const path = require('path');
 const swaggerSpec = require('./swagger');
 
-const outputDir = path.join(__dirname, 'interfaces');
-const outputPath = path.join(outputDir, 'openapi.json');
+const rootOutputPath = path.join(__dirname, 'openapi.json');
+const interfacesDir = path.join(__dirname, 'interfaces');
+const interfacesOutputPath = path.join(interfacesDir, 'openapi.json');
 
-if (!fs.existsSync(outputDir)) {
-  fs.mkdirSync(outputDir, { recursive: true });
+if (!fs.existsSync(interfacesDir)) {
+  fs.mkdirSync(interfacesDir, { recursive: true });
 }
 
-fs.writeFileSync(
-  outputPath,
-  JSON.stringify(swaggerSpec, null, 2)
-);
+const json = JSON.stringify(swaggerSpec, null, 2);
+fs.writeFileSync(rootOutputPath, json);
+fs.writeFileSync(interfacesOutputPath, json);

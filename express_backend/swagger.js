@@ -4,12 +4,35 @@ const options = {
   definition: {
     openapi: '3.0.0',
     info: {
-      title: 'My Express API',
+      title: 'Cloud Resource Manager API',
       version: '1.0.0',
-      description: 'A simple Express API documented with Swagger',
+      description:
+        'Backend API for the Cloud Resource Manager (auth, org isolation, RBAC, and core resource/cost endpoints).'
+    },
+    tags: [
+      { name: 'Health', description: 'Health and status endpoints' },
+      { name: 'Auth', description: 'Authentication & session management' },
+      { name: 'Orgs', description: 'Organization membership & tenant context' },
+      { name: 'CloudAccounts', description: 'Cloud account management (org-scoped)' },
+      { name: 'Resources', description: 'Resource discovery and browsing (org-scoped)' },
+      { name: 'Costs', description: 'Cost analytics (org-scoped)' },
+      { name: 'Recommendations', description: 'Optimization recommendations (org-scoped)' },
+      { name: 'AuditLogs', description: 'Audit logs (org-scoped)' },
+      { name: 'Debug', description: 'Development-only debug endpoints' }
+    ],
+    components: {
+      securitySchemes: {
+        bearerAuth: {
+          type: 'http',
+          scheme: 'bearer',
+          bearerFormat: 'JWT',
+          description: 'JWT access token returned by POST /api/v1/auth/login'
+        }
+      }
     }
   },
-  apis: ['./src/routes/*.js'], // Path to the API docs
+  // Scan TS route files for @swagger blocks
+  apis: ['./src/routes/**/*.ts']
 };
 
 const swaggerSpec = swaggerJSDoc(options);

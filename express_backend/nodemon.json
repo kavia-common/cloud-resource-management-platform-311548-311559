@@ -2,10 +2,12 @@
   "ignore": [
     "node_modules/*",
     "post_process_status.lock",
-    "*.log", "**/*.log"
+    "*.log",
+    "**/*.log",
+    "dist/*"
   ],
   "watch": [
     "src"
   ],
-  "ext": "js,json"
+  "ext": "ts,json"
 }
