@@ -65,8 +65,17 @@ routes.get('/debug/db', (_req, res) => {
 });
 
 routes.use('/api/v1/auth', authRouter);
+
+// Organization endpoints
 routes.use('/api/v1/orgs', orgsRouter);
+// Alias for requested naming
+routes.use('/api/v1/organizations', orgsRouter);
+
+// Cloud accounts endpoints
 routes.use('/api/v1/cloud-accounts', cloudAccountsRouter);
+// Alias for requested naming
+routes.use('/api/v1/accounts', cloudAccountsRouter);
+
 routes.use('/api/v1/resources', resourcesRouter);
 routes.use('/api/v1/costs', costsRouter);
 routes.use('/api/v1/recommendations', recommendationsRouter);

@@ -47,3 +47,37 @@ export async function listRecommendations(params: {
 
   return rows;
 }
+
+// PUBLIC_INTERFACE
+export async function getRecommendationById(params: { orgId: string; id: string }): Promise<DbRecommendationRow | null> {
+  /** Get a recommendation by id within an org (tenant-isolated). */
+  const { rows } = await getPool().query<DbRecommendationRow>(
+    `SELECT id, org_id, resource_id, recommendation_type, severity, title, description, status,
+            potential_savings::text AS potential_savings, currency, metadata, created_at, updated_at
+     FROM public.recommendations
+     WHERE org_id = $1 AND id = $2
+     LIMIT 1`,
+    [params.orgId, params.id]
+  );
+
+  return rows[0] || null;
+}
+
+// PUBLIC_INTERFACE
+export async function updateRecommendationStatus(params: {
+  orgId: string;
+  id: string;
+  status: 'open' | 'snoozed' | 'applied' | 'dismissed';
+}): Promise<DbRecommendationRow | null> {
+  /** Update a recommendation status within an org (tenant-isolated). */
+  const { rows } = await getPool().query<DbRecommendationRow>(
+    `UPDATE public.recommendations
+     SET status = $3
+     WHERE org_id = $1 AND id = $2
+     RETURNING id, org_id, resource_id, recommendation_type, severity, title, description, status,
+               potential_savings::text AS potential_savings, currency, metadata, created_at, updated_at`,
+    [params.orgId, params.id, params.status]
+  );
+
+  return rows[0] || null;
+}

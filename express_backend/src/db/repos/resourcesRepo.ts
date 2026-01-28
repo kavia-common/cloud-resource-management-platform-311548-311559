@@ -65,3 +65,17 @@ export async function listResources(params: {
 
   return rows;
 }
+
+// PUBLIC_INTERFACE
+export async function getResourceById(params: { orgId: string; id: string }): Promise<DbResourceRow | null> {
+  /** Get a resource by id within an org (tenant-isolated). */
+  const { rows } = await getPool().query<DbResourceRow>(
+    `SELECT id, org_id, cloud_account_id, provider, resource_type, provider_resource_id,
+            region, name, tags, metadata, discovered_at, created_at, updated_at
+     FROM public.resources
+     WHERE org_id = $1 AND id = $2
+     LIMIT 1`,
+    [params.orgId, params.id]
+  );
+  return rows[0] || null;
+}

@@ -32,3 +32,34 @@ export async function listAuditLogs(params: {
 
   return rows;
 }
+
+// PUBLIC_INTERFACE
+export async function createAuditLog(params: {
+  orgId: string;
+  actorUserId?: string | null;
+  action: string;
+  entityType?: string | null;
+  entityId?: string | null;
+  ipAddress?: string | null;
+  userAgent?: string | null;
+  metadata?: Record<string, unknown>;
+}): Promise<{ id: string; createdAt: string }> {
+  /** Create an audit log entry (org-scoped, append-only). */
+  const { rows } = await getPool().query<{ id: string; created_at: string }>(
+    `INSERT INTO public.audit_logs (org_id, actor_user_id, action, entity_type, entity_id, ip_address, user_agent, metadata)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8::jsonb)
+     RETURNING id, created_at`,
+    [
+      params.orgId,
+      params.actorUserId ?? null,
+      params.action,
+      params.entityType ?? null,
+      params.entityId ?? null,
+      params.ipAddress ?? null,
+      params.userAgent ?? null,
+      JSON.stringify(params.metadata ?? {})
+    ]
+  );
+
+  return { id: rows[0].id, createdAt: rows[0].created_at };
+}

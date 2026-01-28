@@ -65,11 +65,18 @@ export function resolveDbConfig(): DbConfigResolved {
   };
 }
 
+const nodeEnv = process.env.NODE_ENV || 'development';
+
+// Never ship a hard-coded JWT secret in non-dev environments.
+const jwtAccessSecret =
+  process.env.JWT_ACCESS_SECRET ||
+  (nodeEnv === 'development' ? 'dev_access_secret_change_me' : required('JWT_ACCESS_SECRET', process.env.JWT_ACCESS_SECRET));
+
 // PUBLIC_INTERFACE
 export const env = {
   /** Resolved runtime environment configuration for the API server. */
 
-  nodeEnv: process.env.NODE_ENV || 'development',
+  nodeEnv,
   host: process.env.HOST || '0.0.0.0',
   port: readInt(process.env.PORT, 3001),
   trustProxy: readBool(process.env.TRUST_PROXY, true),
@@ -96,10 +103,7 @@ export const env = {
   rateLimitWindowMs: readInt(process.env.RATE_LIMIT_WINDOW_S, 60) * 1000,
   rateLimitMax: readInt(process.env.RATE_LIMIT_MAX, 100),
 
-  jwtAccessSecret:
-    process.env.JWT_ACCESS_SECRET ||
-    // Development-only fallback to keep local dev usable if env isn't set.
-    'dev_access_secret_change_me',
+  jwtAccessSecret,
   accessTokenTtlSeconds: readInt(process.env.ACCESS_TOKEN_TTL_S, 900),
 
   refreshTokenTtlDays: readInt(process.env.REFRESH_TOKEN_TTL_DAYS, 30),

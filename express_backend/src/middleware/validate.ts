@@ -43,3 +43,24 @@ export function validateQuery<T>(schema: ZodSchema<T>): RequestHandler {
     }
   };
 }
+
+// PUBLIC_INTERFACE
+export function validateParams<T>(schema: ZodSchema<T>): RequestHandler {
+  /** Validate and coerce request params (req.params) using a Zod schema. */
+  return (req, _res, next) => {
+    try {
+      req.params = schema.parse(req.params) as any;
+      next();
+    } catch (err) {
+      if (err instanceof ZodError) {
+        return next(
+          badRequest(
+            'VALIDATION_ERROR',
+            err.errors.map((e) => e.message).join('; ')
+          )
+        );
+      }
+      return next(err);
+    }
+  };
+}
